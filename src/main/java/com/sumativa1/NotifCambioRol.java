@@ -1,7 +1,5 @@
 package com.sumativa1;
 
-import java.util.Optional;
-
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -22,43 +20,28 @@ import com.microsoft.azure.functions.annotation.HttpTrigger;
  * }
  */
 
-public class NotifCambioRol {
-    
+ public class NotifCambioRol {
+
     @FunctionName("NotifCambioRol")
     public HttpResponseMessage run(
-        @HttpTrigger(
-                name = "req",
-                methods = {HttpMethod.GET, HttpMethod.POST},
-                authLevel = AuthorizationLevel.ANONYMOUS)
-                HttpRequestMessage<Optional<String>> request,
-            final ExecutionContext context) {
+        @HttpTrigger(name = "req", methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<String> request,
+        final ExecutionContext context) {
 
-        context.getLogger().info("NotifCambioRol function processed a request.");
-
-        //obtenemos el cuerpo de la request
-        Optional<String> requestBody = request.getBody();
-        if (!requestBody.isPresent() || requestBody.get().trim().isEmpty()) {
+        String body = request.getBody();
+        if (body == null || body.trim().isEmpty()) {
             return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                            .body("El cuerpo ta vacio. Se espera un JSON con los detalles para el cambio de rol.")
-                            .build();
-        }
-
-        String body = requestBody.get();
-        context.getLogger().info("Datos recibidos: " + body);
-
-        // Simular retardo de 3 segundos para emular el envío de correo
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            context.getLogger().severe("Error durante la simulación de espera: " + e.getMessage());
-            Thread.currentThread().interrupt();
-        }
-        //la simulacion espera que se envie correctamente el correo
-        String responseMessage = "Notificacion de cambio de rol enviada, datos recibidos: " + body;
-
-        return request.createResponseBuilder(HttpStatus.OK)
-                        .body(responseMessage)
+                        .body("Cuerpo vacío, se espera un JSON con los detalles para el cambio de rol.")
                         .build();
+        }
+        context.getLogger().info("Cuerpo recibido: " + body);
+        
+        // Opcional: deserializar manualmente el JSON a un objeto
+        // CambioRolRequest cambio = new ObjectMapper().readValue(body, CambioRolRequest.class);
+
+        String responseMessage = "Notificación de cambio de rol enviada, email: " + body; // o extrae el campo email después de deserializar
+        return request.createResponseBuilder(HttpStatus.OK)
+                    .body(responseMessage)
+                    .build();
     }
-    
 }
