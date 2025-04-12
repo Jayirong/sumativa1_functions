@@ -1,4 +1,4 @@
-package com.sumativa1.GraphQL;
+package com.sumativa1.GraphQL.fetcher;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
