@@ -1,0 +1,9 @@
+type Usuario {
+  id: ID
+  nombre: String
+  correo: String
+}
+
+type Query {
+  usuariosPorPerfil(nombrePerfil: String!): [Usuario]
+}
