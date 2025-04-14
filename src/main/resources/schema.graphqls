@@ -1,0 +1,16 @@
+type Usuario {
+  id: ID!
+  nombre: String!
+  email: String!
+  perfil: String!
+}
+
+type PerfilResumen {
+  perfil: String!
+  totalUsuarios: Int!
+}
+
+type Query {
+  usuariosPorPerfil(nombrePerfil: String!): [Usuario!]!
+  resumenUsuariosPorPerfil: [PerfilResumen!]!
+}
