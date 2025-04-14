@@ -9,26 +9,48 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UsuariosPorPerfilFetcher implements DataFetcher<List<Map<String, Object>>> {
-
-    private static final String USUARIO_BACKEND_URL = "http://localhost:8081/api/usuarios/porPerfil?nombrePerfil=";
+public class UsuariosPorPerfilFetcher implements DataFetcher<List<Map<String,Object>>> {
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private final HttpClient http = HttpClient.newHttpClient();
+    private final String baseUrl = System.getenv().getOrDefault("USUARIOS_BACKEND_URL",
+                                           "http://localhost:8085/api");
 
     @Override
-    public List<Map<String, Object>> get(DataFetchingEnvironment environment) throws Exception {
-        String perfil = environment.getArgument("nombrePerfil");
+    public List<Map<String,Object>> get(DataFetchingEnvironment env) throws Exception {
+        String perfil = env.getArgument("nombrePerfil");
+        URI uri = URI.create(String.format("%s/usuarios?perfil=%s", baseUrl, perfil));
+        HttpResponse<String> res = http.send(HttpRequest.newBuilder().uri(uri).GET().build(),
+                                             HttpResponse.BodyHandlers.ofString());
+        if (res.statusCode() != 200)
+            throw new RuntimeException("Backend responded " + res.statusCode());
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(USUARIO_BACKEND_URL + perfil))
-                .GET()
-                .build();
+        // Paso 1: deserializa a List<Map>
+        List<Map<String,Object>> raw = mapper.readValue(res.body(),
+                new TypeReference<List<Map<String,Object>>>(){});
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // Paso 2: adapta claves y aplana el objeto perfil
+        List<Map<String,Object>> adaptado = new ArrayList<>();
+        for (Map<String,Object> u : raw) {
+            Map<String,Object> g = new HashMap<>();
+            g.put("id", u.get("idUsuario"));
+            g.put("nombre", u.get("nombre"));
+            g.put("email", u.get("email"));
 
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(response.body(), new TypeReference<List<Map<String, Object>>>() {});
+            Object perfilObj = u.get("perfil");
+            if (perfilObj instanceof Map) {
+                Map<?,?> p = (Map<?,?>) perfilObj;
+                Object nombrePerfil = p.get("nombre");
+                g.put("perfil", nombrePerfil != null ? nombrePerfil : null);
+            } else {
+                g.put("perfil", null);
+            }
+            adaptado.add(g);
+        }
+        return adaptado;
     }
 }
