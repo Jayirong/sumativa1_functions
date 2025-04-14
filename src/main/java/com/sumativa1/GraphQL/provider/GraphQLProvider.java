@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.Reader;
 
+import com.sumativa1.GraphQL.fetcher.ResumenUsuariosPorPerfilFetcher;
 import com.sumativa1.GraphQL.fetcher.UsuariosPorPerfilFetcher;
 
 public class GraphQLProvider {
@@ -33,7 +34,8 @@ public class GraphQLProvider {
 
         RuntimeWiring wiring = RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
-                        .dataFetcher("usuariosPorPerfil", new UsuariosPorPerfilFetcher()))
+                        .dataFetcher("usuariosPorPerfil", new UsuariosPorPerfilFetcher())
+                        .dataFetcher("resumenUsuariosPorPerfil", new ResumenUsuariosPorPerfilFetcher()))
                 .build();
 
         GraphQLSchema schema = new SchemaGenerator()

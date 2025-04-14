@@ -4,6 +4,12 @@ type Usuario {
   correo: String
 }
 
+type PerfilResumen {
+  perfil: String!
+  totalUsuarios: Int!
+}
+
 type Query {
   usuariosPorPerfil(nombrePerfil: String!): [Usuario]
+  resumenUsuariosPorPerfil: [PerfilResumen!]!
 }
