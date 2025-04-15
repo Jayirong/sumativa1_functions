@@ -18,7 +18,7 @@ public class UsuariosPorPerfilFetcher implements DataFetcher<List<Map<String,Obj
     private static final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient http = HttpClient.newHttpClient();
     private final String baseUrl = System.getenv().getOrDefault("USUARIOS_BACKEND_URL",
-                                           "http://localhost:8085/api");
+                                           "http://98.84.66.114:8085/api");
 
     @Override
     public List<Map<String,Object>> get(DataFetchingEnvironment env) throws Exception {
