@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class ResumenUsuariosPorPerfilFetcher implements DataFetcher<List<Map<String, Object>>>{
     
     //endpoint que retorna la lista de usuarios, hay que cambiarlo para apuntar bien
-    private static final String USUARIOS_BACKEND_URL = "http://localhost:8085/api/usuarios";
+    private static final String USUARIOS_BACKEND_URL = "http://98.84.66.114:8085/api/usuarios";
 
     @Override
     public List<Map<String, Object>> get(DataFetchingEnvironment environment) throws Exception {
